@@ -13,15 +13,6 @@ export function initTasks(): TaskOrEmpty[] {
   const currentDate = new Date();
   const tasks: TaskOrEmpty[] = [
     {
-      start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 2),
-      end: new Date(currentDate.getFullYear(), currentDate.getMonth(), 8),
-      name: "Some Project",
-      id: "ProjectSample",
-      progress: 25,
-      type: "project",
-      hideChildren: false
-    },
-    {
       start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
       end: new Date(
         currentDate.getFullYear(),
@@ -34,13 +25,11 @@ export function initTasks(): TaskOrEmpty[] {
       id: "Idea",
       progress: 45,
       type: "task",
-      parent: "ProjectSample"
     },
     {
       id: "taskWithoutDateId",
       type: "empty",
       name: "TaskWithoutDate",
-      parent: "ProjectSample"
     },
     {
       start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 2),
@@ -56,7 +45,6 @@ export function initTasks(): TaskOrEmpty[] {
         }
       ],
       type: "task",
-      parent: "ProjectSample"
     },
     {
       start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 4),
@@ -72,7 +60,6 @@ export function initTasks(): TaskOrEmpty[] {
         }
       ],
       type: "task",
-      parent: "ProjectSample"
     },
     {
       start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 8),
@@ -94,7 +81,6 @@ export function initTasks(): TaskOrEmpty[] {
         }
       ],
       type: "project",
-      parent: "ProjectSample",
       isDisabled: true,
       hideChildren: true
     },
@@ -150,7 +136,6 @@ export function initTasks(): TaskOrEmpty[] {
           ownTarget: "startOfTask"
         }
       ],
-      parent: "ProjectSample"
     },
     {
       start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 18),
@@ -240,6 +225,7 @@ export const onAddTask = (parentTask: Task) => {
 };
 
 export const onEditTask = (editableTaskInfo: EditableTaskInfo) => {
+  console.log(editableTaskInfo)
   const { task, start, end } = editableTaskInfo;
   const taskFields = getTaskFields({
     name: task.name,

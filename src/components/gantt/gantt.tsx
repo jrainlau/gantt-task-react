@@ -13,6 +13,7 @@ import {
   DateSetup,
   Dependency,
   Distances,
+  EditableTaskInfo,
   FixPosition,
   GanttDateRoundingTimeUnit,
   GanttProps,
@@ -790,10 +791,12 @@ export const Gantt: React.FC<GanttProps> = ({
   );
 
   const handleEditTask = useCallback(
-    (task: TaskOrEmpty) => {
+    (editableTaskInfo: EditableTaskInfo) => {
       if (!onEditTaskClick && (!onEditTask || !onChangeTasks)) {
         return;
       }
+
+      const { task } = editableTaskInfo;
 
       const { id, comparisonLevel = 1 } = task;
 
@@ -810,14 +813,14 @@ export const Gantt: React.FC<GanttProps> = ({
       }
 
       if (onEditTaskClick) {
-        onEditTaskClick(task, taskIndex, (changedTask: TaskOrEmpty) =>
+        onEditTaskClick((editableTaskInfo), taskIndex, (changedTask: TaskOrEmpty) =>
           getMetadata({
             type: "change",
             task: changedTask
           })
         );
       } else if (onEditTask && onChangeTasks) {
-        onEditTask(task).then(nextTask => {
+        onEditTask(editableTaskInfo).then(nextTask => {
           if (!nextTask) {
             return;
           }
@@ -1954,6 +1957,7 @@ export const Gantt: React.FC<GanttProps> = ({
         ganttTaskRootRef={ganttTaskRootRef}
         onScrollGanttContentVertically={onScrollVertically}
         colors={colors}
+        handleEditTask={handleEditTask}
       />
 
       {tooltipTaskFromMap && (

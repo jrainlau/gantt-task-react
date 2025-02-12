@@ -12,9 +12,10 @@ import {
   Task,
   Distances,
   DateExtremity,
-  TaskDependencyContextualPaletteProps, ColorStyles
+  TaskDependencyContextualPaletteProps, ColorStyles, EditableTaskInfo
 } from "../../types/public-types";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
+import { HoverableCell } from "../other/hoverable-cell";
 
 export type TaskGanttProps = {
   barProps: TaskGanttContentProps;
@@ -32,6 +33,7 @@ export type TaskGanttProps = {
     event: SyntheticEvent<HTMLDivElement>
   ) => void;
   colors: Partial<ColorStyles>
+  handleEditTask: (editableTaskInfo: EditableTaskInfo) => void;
 };
 
 const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
@@ -49,7 +51,8 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
     onVerticalScrollbarScrollX,
     ganttTaskRootRef,
     onScrollGanttContentVertically: onScrollVertically,
-    colors
+    colors,
+    handleEditTask,
   } = props;
   const containerStyle: CSSProperties = {
     // In order to see the vertical scrollbar of the gantt content,
@@ -101,6 +104,8 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
     setArrowAnchorEl(event.currentTarget);
     setSelectedDependency({ taskFrom, extremityFrom, taskTo, extremityTo });
   };
+
+  const [selectedCellPos, setSelectedCellPos] = React.useState<[number, number]>([0, 0]);
 
   const onCloseArrowContextualPalette = () => {
     setArrowAnchorEl(null);
@@ -180,6 +185,30 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
       }
     }
   };
+
+  const lastPosRef = React.useRef<[number, number]>([-999, -999]);
+  const onMouseMove = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const xIndex = Math.floor(x / columnWidth);
+    const yIndex = Math.floor(y / rowHeight);
+
+    if (lastPosRef.current[0] === xIndex && lastPosRef.current[1] === yIndex) {
+      return;
+    }
+
+    lastPosRef.current = [xIndex, yIndex];
+
+    const { mapGlobalRowIndexToTask } = barProps;
+    const task = mapGlobalRowIndexToTask.get(yIndex);
+    if (task.type === 'empty') {
+      setSelectedCellPos([xIndex, yIndex]);
+    } else {
+      setSelectedCellPos([-999, -999]);
+    }
+  }
+
   return (
     <div
       className={styles.ganttTaskRoot}
@@ -205,12 +234,25 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
             style={{
               background: colors.oddTaskBackgroundColor
             }}
+            onMouseMove={onMouseMove}
           >
             <Grid {...gridProps} />
             <TaskGanttContent
               {...barProps}
               onClick={onClickTask}
               onArrowClick={onClickArrow}
+            />
+            <HoverableCell
+              x={selectedCellPos[0] * columnWidth}
+              y={selectedCellPos[1] * rowHeight}
+              width={columnWidth}
+              height={rowHeight}
+              selectedCellPos={selectedCellPos}
+              gridProps={gridProps}
+              barProps={barProps}
+              onClick={(editableTaskInfo) => {
+                handleEditTask(editableTaskInfo);
+              }}
             />
           </svg>
         </div>

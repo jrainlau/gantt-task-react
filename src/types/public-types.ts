@@ -156,7 +156,7 @@ export interface Distances {
   titleCellWidth: number;
 }
 
-export type TaskType = "task" | "milestone" | "project";
+export type TaskType = "task" | "milestone" | "project" | "empty" ;
 
 export interface Task {
   id: string;
@@ -250,8 +250,14 @@ export type OnProgressChange = (
   index: number
 ) => void;
 
+export type EditableTaskInfo = {
+  task: TaskOrEmpty;
+  start: Date;
+  end: Date;
+}
+
 export type OnEditTask = (
-  task: TaskOrEmpty,
+  editableTaskInfo: EditableTaskInfo,
   index: number,
   getMetadata: GetMetadata
 ) => void;
@@ -425,7 +431,7 @@ export interface EventOption {
   /**
    * Callback for getting new data of the edited task
    */
-  onEditTask?: (task: TaskOrEmpty) => Promise<TaskOrEmpty | null>;
+  onEditTask?: (editableTaskInfo: EditableTaskInfo) => Promise<TaskOrEmpty | null>;
   /**
    * Invokes on edit button click
    */
@@ -628,7 +634,7 @@ export interface TaskListTableProps {
   getTaskCurrentState: (task: Task) => Task;
   handleAddTask: (task: Task) => void;
   handleDeleteTasks: (task: TaskOrEmpty[]) => void;
-  handleEditTask: (task: TaskOrEmpty) => void;
+  handleEditTask: (editableTaskInfo: EditableTaskInfo) => void;
   handleMoveTaskBefore: (target: TaskOrEmpty, taskForMove: TaskOrEmpty) => void;
   handleMoveTaskAfter: (target: TaskOrEmpty, taskForMove: TaskOrEmpty) => void;
   handleMoveTasksInside: (parent: Task, childs: readonly TaskOrEmpty[]) => void;
@@ -811,7 +817,7 @@ export type ColumnData = {
   distances: Distances;
   handleAddTask: (task: Task) => void;
   handleDeleteTasks: (task: TaskOrEmpty[]) => void;
-  handleEditTask: (task: TaskOrEmpty) => void;
+  handleEditTask: (editableTaskInfo: EditableTaskInfo) => void;
   hasChildren: boolean;
   icons?: Partial<Icons>;
   indexStr: string;

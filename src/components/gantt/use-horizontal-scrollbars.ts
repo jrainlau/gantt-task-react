@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { RefObject, SyntheticEvent } from "react";
 
 import { SCROLL_STEP } from "../../constants";

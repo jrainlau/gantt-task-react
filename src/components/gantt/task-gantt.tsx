@@ -58,10 +58,11 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
     // In order to see the vertical scrollbar of the gantt content,
     // we resize dynamically the width of the gantt content
     height: Math.max(ganttFullHeight, minimumRowDisplayed * rowHeight),
-    width: ganttTaskRootRef?.current
-      ? ganttTaskRootRef.current.clientWidth +
-        ganttTaskRootRef.current.scrollLeft
-      : fullSvgWidth,
+    // width: ganttTaskRootRef?.current
+    //   ? ganttTaskRootRef.current.clientWidth +
+    //     ganttTaskRootRef.current.scrollLeft
+    //   : fullSvgWidth,
+    width: fullSvgWidth,
   };
 
   const gridStyle = useMemo<CSSProperties>(

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import enDateLocale from "date-fns/locale/en-US";
 
@@ -80,6 +80,20 @@ import { deleteOption } from "../../context-menu-options/delete";
 import { useHolidays } from "./use-holidays";
 
 import styles from "./gantt.module.css";
+
+type ScrollContextType = {
+  scrollX: number;
+  observer: IntersectionObserver | null;
+}
+
+const ScrollContext = createContext<ScrollContextType>({
+  scrollX: 0,
+  observer: null,
+});
+
+export const useScroll = () => {
+  return useContext(ScrollContext);
+};
 
 const defaultColors: ColorStyles = {
   arrowColor: "grey",
@@ -1926,6 +1940,14 @@ export const Gantt: React.FC<GanttProps> = ({
     onExpandAll
   };
 
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.intersectionRatio === 1) {
+        console.log('C完全在A的可视区域内');
+      }
+    });
+  }, { root: wrapperRef.current, threshold: 1 });
+
   const displayTable = !columnsProp || columnsProp.length > 0;
   return (
     <div
@@ -1943,6 +1965,7 @@ export const Gantt: React.FC<GanttProps> = ({
       {/* {columns.length > 0 && <TaskList {...tableProps} />} */}
       {displayTable && <TaskList {...tableProps} />}
 
+    <ScrollContext.Provider value={{ scrollX, observer }}>
       <TaskGantt
         barProps={barProps}
         calendarProps={calendarProps}
@@ -1986,6 +2009,7 @@ export const Gantt: React.FC<GanttProps> = ({
           options={contextMenuOptions}
         />
       )}
+    </ScrollContext.Provider>
     </div>
   );
 };

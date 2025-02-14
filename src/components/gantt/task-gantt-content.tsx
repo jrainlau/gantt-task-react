@@ -200,12 +200,15 @@ export const TaskGanttContent: React.FC<TaskGanttContentProps> = ({
         x2: taskX2,
       } = getTaskCoordinates(task);
 
+      const svgX = containerX + (additionalLeftSpace || 0);
+      const svgY = levelY;
+
       tasksRes.push(
         <svg
           id={task.id}
           className="TaskItemClassName"
-          x={containerX + (additionalLeftSpace || 0)}
-          y={levelY}
+          x={svgX}
+          y={svgY}
           width={containerWidth}
           height={fullRowHeight}
           key={key}

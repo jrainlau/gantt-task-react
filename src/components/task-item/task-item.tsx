@@ -27,7 +27,7 @@ import { TaskWarning } from "./task-warning";
 import style from "./task-list.module.css";
 import { BarFixWidth, fixWidthContainerClass } from "../other/bar-fix-width";
 import { BarRelationHandle } from "./bar/bar-relation-handle";
-import { useScroll } from "../gantt/gantt";
+import { useScroll } from "../gantt/task-gantt";
 
 export type TaskItemProps = {
   children?: React.ReactNode
@@ -332,6 +332,12 @@ const TaskItemInner: React.FC<TaskItemProps> = props => {
     }
   }, [textRef, width]);
 
+  useEffect(() => {
+    if (task.name === 'Task 6') {
+      observer.observe(taskRootRef.current)
+    }
+  }, [])
+
   const x = useMemo(() => {
     if (isTextInside) {
       return x1 + width * 0.5;
@@ -342,7 +348,7 @@ const TaskItemInner: React.FC<TaskItemProps> = props => {
     }
 
     return x1 + width + arrowIndent * 1.2;
-  }, [x1, width, isTextInside, rtl, arrowIndent, scrollX]);
+  }, [x1, width, isTextInside, rtl, arrowIndent]);
 
   const onMouseDown = useCallback<MouseEventHandler>(
     event => {
@@ -361,12 +367,6 @@ const TaskItemInner: React.FC<TaskItemProps> = props => {
   const onMouseLeave = useCallback(() => {
     setTooltipTask(null, null);
   }, [setTooltipTask]);
-
-  useEffect(() => {
-    if (task.name === 'Task 6') {
-      observer.observe(textRef.current)
-    }
-  }, [])
 
   let barLabelFill = (isTextInside || task.type == "milestone") ? styles.barLabelColor : styles.barLabelWhenOutsideColor;
   return (

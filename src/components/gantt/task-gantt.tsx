@@ -1,4 +1,4 @@
-import React, { memo, SyntheticEvent, useMemo } from "react";
+import React, { createContext, memo, SyntheticEvent, useContext, useMemo } from "react";
 import type { CSSProperties, RefObject } from "react";
 
 import { GridProps, Grid } from "../grid/grid";
@@ -16,6 +16,19 @@ import {
 } from "../../types/public-types";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { HoverableCell } from "../other/hoverable-cell";
+
+
+type ScrollContextType = {
+  observer: IntersectionObserver | null;
+}
+
+const ScrollContext = createContext<ScrollContextType>({
+  observer: null,
+});
+
+export const useScroll = () => {
+  return useContext(ScrollContext);
+};
 
 export type TaskGanttProps = {
   barProps: TaskGanttContentProps;
@@ -210,9 +223,26 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
     }
   }
 
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const { intersectionRatio, isIntersecting, boundingClientRect, rootBounds } = entry;
+      if (!intersectionRatio && !isIntersecting) {
+        if (boundingClientRect.x >= rootBounds.x + rootBounds.width) {
+          console.log('在右边')
+        } else {
+          console.log('在左边')
+        }
+      }
+    })
+  }, {
+    root: ganttTaskRootRef.current,
+    threshold: 0
+  })
+
   return (
+    <ScrollContext.Provider value={{ observer }}>
     <div
-      className={styles.ganttTaskRoot}
+      className={[styles.ganttTaskRoot, 'gantt-task-root'].join(' ')}
       ref={ganttTaskRootRef}
       onScroll={onVerticalScrollbarScrollX}
       dir="ltr"
@@ -286,6 +316,7 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
           )}
       </div>
     </div>
+    </ScrollContext.Provider>
   );
 };
 

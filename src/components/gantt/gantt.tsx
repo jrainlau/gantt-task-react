@@ -427,6 +427,7 @@ export const Gantt: React.FC<GanttProps> = ({
     cutSelectedTasks,
     cutTask,
     resetSelectedTasks,
+    selectTask,
     selectTaskOnMouseDown,
     selectedIdsMirror
   } = useSelection(taskToRowIndexMap, rowIndexToTaskMap, checkTaskIdExists);
@@ -641,7 +642,7 @@ export const Gantt: React.FC<GanttProps> = ({
 
     const wrapperNode = wrapperRef.current;
 
-    // subscribe if scrol necessary
+    // subscribe if scroll necessary
     if (wrapperNode) {
       wrapperNode.addEventListener("wheel", handleWheel, {
         passive: false
@@ -1958,6 +1959,8 @@ export const Gantt: React.FC<GanttProps> = ({
         onScrollGanttContentVertically={onScrollVertically}
         colors={colors}
         handleEditTask={handleEditTask}
+        scrollToTask={scrollToTask}
+        selectTask={selectTask}
       />
 
       {tooltipTaskFromMap && (

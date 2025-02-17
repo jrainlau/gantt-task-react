@@ -16,7 +16,12 @@ import {
 } from "../../types/public-types";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { HoverableCell } from "../other/hoverable-cell";
+import { QuickLocateBtns } from "../other/quick-locate-btns";
 
+export type TaskItemPosMap = {
+  left: Set<string>;
+  right: Set<string>;
+}
 
 type ScrollContextType = {
   observer: IntersectionObserver | null;
@@ -47,6 +52,8 @@ export type TaskGanttProps = {
   ) => void;
   colors: Partial<ColorStyles>
   handleEditTask: (editableTaskInfo: EditableTaskInfo) => void;
+  scrollToTask: (task: Task) => void;
+  selectTask: (taskId: string) => void;
 };
 
 const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
@@ -66,6 +73,8 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
     onScrollGanttContentVertically: onScrollVertically,
     colors,
     handleEditTask,
+    scrollToTask,
+    selectTask,
   } = props;
   const containerStyle: CSSProperties = {
     // In order to see the vertical scrollbar of the gantt content,
@@ -120,6 +129,8 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
   };
 
   const [selectedCellPos, setSelectedCellPos] = React.useState<[number, number]>([0, 0]);
+
+  const [taskItemPosMap, setTaskItemPosMap] = React.useState<TaskItemPosMap>({ left: new Set(), right: new Set() });
 
   const onCloseArrowContextualPalette = () => {
     setArrowAnchorEl(null);
@@ -225,15 +236,38 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
-      const { intersectionRatio, isIntersecting, boundingClientRect, rootBounds } = entry;
+      const { intersectionRatio, isIntersecting, boundingClientRect, rootBounds, target } = entry;
+      const taskId = (target as HTMLElement).dataset.taskId
       if (!intersectionRatio && !isIntersecting) {
         if (boundingClientRect.x >= rootBounds.x + rootBounds.width) {
-          console.log('在右边')
+          updateTaskPos(taskId, 'right')
         } else {
-          console.log('在左边')
+          updateTaskPos(taskId, 'left')
         }
       }
+
+      if (intersectionRatio) {
+        updateTaskPos(taskId, 'middle')
+      }
     })
+
+    function updateTaskPos(taskId: string, pos: 'left' | 'right' | 'middle') {
+      setTaskItemPosMap(prev => {
+        const newLeft = new Set(prev.left)
+        const newRight = new Set(prev.right)
+
+        newLeft.delete(taskId)
+        newRight.delete(taskId)
+
+        if (pos === 'left') {
+          newLeft.add(taskId)
+        } else if (pos === 'right') {
+          newRight.add(taskId)
+        }
+
+        return { left: newLeft, right: newRight }
+      })
+    }
   }, {
     root: ganttTaskRootRef.current,
     threshold: 0
@@ -315,6 +349,16 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
             </ClickAwayListener>
           )}
       </div>
+
+      <QuickLocateBtns
+        fullRowHeight={fullRowHeight}
+        barProps={barProps}
+        taskItemPosMap={taskItemPosMap}
+        scrollToTask={scrollToTask}
+        selectTask={selectTask}
+        ganttTaskContentRef={ganttTaskContentRef}
+        ganttTaskRootRef={ganttTaskRootRef}
+      />
     </div>
     </ScrollContext.Provider>
   );

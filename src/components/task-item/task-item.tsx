@@ -333,9 +333,7 @@ const TaskItemInner: React.FC<TaskItemProps> = props => {
   }, [textRef, width]);
 
   useEffect(() => {
-    if (task.name === 'Task 6') {
-      observer.observe(taskRootRef.current)
-    }
+    observer.observe(taskRootRef.current)
   }, [])
 
   const x = useMemo(() => {
@@ -372,6 +370,7 @@ const TaskItemInner: React.FC<TaskItemProps> = props => {
   return (
     <g
       className={fixWidthContainerClass}
+      data-task-id={task.id}
       onKeyDown={e => {
         switch (e.key) {
           case "Delete": {

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 
 import addDays from 'date-fns/addDays';
 
@@ -7,6 +7,7 @@ import { Gantt, OnChangeTasks, Task, TaskOrEmpty, TitleColumn, ViewMode } from '
 import { onAddTask, onEditTask } from './helper';
 
 import '../dist/style.css';
+import { ExposeMethods } from '../src/components/gantt/gantt';
 
 const NUMBER_OF_SUBTASKS = 6;
 
@@ -116,18 +117,31 @@ export const Simple: React.FC = props => {
     id: 'Task'
   }]
 
+  const ganttRef = useRef<ExposeMethods>(null);
+
+  const scrollToToday = () => {
+    ganttRef.current?.scrollToDate(new Date());
+  }
+
   return (
-    <Gantt
-      {...props}
-      columns={columns}
-      viewMode={ViewMode.Day}
-      onAddTask={onAddTask}
-      onChangeTasks={onChangeTasks}
-      onDoubleClick={handleDblClick}
-      onEditTask={onEditTask}
-      onClick={handleClick}
-      tasks={tasks}
-      checkIsHoliday={() => false}
-    />
+    <>
+      <button onClick={scrollToToday}>xxx</button>
+      <Gantt
+        {...props}
+        ref={ganttRef}
+        columns={columns}
+        viewMode={ViewMode.Day}
+        onAddTask={onAddTask}
+        onChangeTasks={onChangeTasks}
+        onDoubleClick={handleDblClick}
+        onEditTask={onEditTask}
+        onClick={handleClick}
+        tasks={tasks}
+        checkIsHoliday={() => false}
+        dateLocale={{
+          code: 'zh-CN'
+        }}
+      />
+    </>
   );
 };

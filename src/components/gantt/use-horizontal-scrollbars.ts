@@ -1,12 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { RefObject, SyntheticEvent } from "react";
 
 import { SCROLL_STEP } from "../../constants";
+import { getDatesDiff } from "../../helpers/get-dates-diff";
+import { ViewMode } from "../..";
+
+interface ScrollToDateParams {
+  targetDate: Date;
+  startDate: Date;
+  viewMode: ViewMode;
+  columnWidth: number;
+}
 
 export const useHorizontalScrollbars = (): [
   RefObject<HTMLDivElement>,
   number,
   (nextScrollX: number) => void,
+  (scrollToDateParams: ScrollToDateParams) => void,
   (event: SyntheticEvent<HTMLDivElement>) => void,
   () => void,
   () => void
@@ -35,6 +45,28 @@ export const useHorizontalScrollbars = (): [
     setTimeout(() => {
       isLockedRef.current = false;
     }, 300);
+  }, []);
+
+  const scrollXToDate = useCallback(({
+    targetDate,
+    startDate,
+    viewMode,
+    columnWidth,
+  }: {
+    targetDate: Date;
+    startDate: Date;
+    viewMode: ViewMode;
+    columnWidth: number;
+  }) => {
+    if (!ganttTaskRootRef.current) {
+      return;
+    }
+
+    const targetDateIndex = getDatesDiff(targetDate, startDate, viewMode);
+
+    const tickX = targetDateIndex * columnWidth;
+
+    setScrollXProgrammatically(tickX - 100);
   }, []);
 
   const onVerticalScrollbarScrollX = useCallback(
@@ -66,6 +98,7 @@ export const useHorizontalScrollbars = (): [
     ganttTaskRootRef,
     scrollX,
     setScrollXProgrammatically,
+    scrollXToDate,
     onVerticalScrollbarScrollX,
     scrollToLeftStep,
     scrollToRightStep,

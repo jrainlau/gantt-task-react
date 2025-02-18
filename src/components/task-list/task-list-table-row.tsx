@@ -8,6 +8,7 @@ import {
   DateSetup,
   DependencyMap,
   Distances,
+  EditableTaskInfo,
   Icons,
   Task,
   TaskOrEmpty
@@ -27,7 +28,7 @@ type TaskListTableRowProps = {
   getTaskCurrentState: (task: Task) => Task;
   handleAddTask: (task: Task) => void;
   handleDeleteTasks: (task: TaskOrEmpty[]) => void;
-  handleEditTask: (task: TaskOrEmpty) => void;
+  handleEditTask: (task: EditableTaskInfo) => void;
   handleMoveTaskBefore: (target: TaskOrEmpty, taskForMove: TaskOrEmpty) => void;
   handleMoveTaskAfter: (target: TaskOrEmpty, taskForMove: TaskOrEmpty) => void;
   handleMoveTasksInside: (parent: Task, childs: readonly TaskOrEmpty[]) => void;

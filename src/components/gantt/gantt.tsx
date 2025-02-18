@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import enDateLocale from "date-fns/locale/en-US";
 
@@ -163,74 +163,78 @@ const defaultDistances: Distances = {
 
 const MINIMUM_DISPLAYED_TIME_UNIT = 30;
 
-export const Gantt: React.FC<GanttProps> = ({
-                                              TaskListHeader = TaskListHeaderDefault,
-                                              TaskListTable = TaskListTableDefault,
-                                              TooltipContent = StandardTooltipContent,
-                                              ContextualPalette,
-                                              TaskDependencyContextualPalette,
-                                              authorizedRelations = [
-                                                "startToStart",
-                                                "startToEnd",
-                                                "endToStart",
-                                                "endToEnd"
-                                              ],
-                                              canMoveTasks = true,
-                                              canResizeColumns = true,
-                                              checkIsHoliday: checkIsHolidayProp = defaultCheckIsHoliday,
-                                              colors = defaultColors,
-                                              columns: columnsProp = undefined,
-                                              comparisonLevels = 1,
-                                              contextMenuOptions: contextMenuOptionsProp = undefined,
-                                              dateFormats: dateFormatsProp = undefined,
-                                              dateLocale = enDateLocale,
-                                              distances: distancesProp = undefined,
-                                              enableTableListContextMenu = false,
-                                              fixEndPosition: fixEndPositionProp = undefined,
-                                              fixStartPosition: fixStartPositionProp = undefined,
-                                              fontFamily = "Arial, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue",
-                                              fontSize = "14px",
-                                              getCopiedTaskId = defaultGetCopiedTaskId,
-                                              icons = undefined,
-                                              isDeleteDependencyOnDoubleClick = true,
-                                              isMoveChildsWithParent = true,
-                                              isUpdateDisabledParentsOnChange = true,
-                                              isShowChildOutOfParentWarnings = false,
-                                              isShowCriticalPath = false,
-                                              isShowDependencyWarnings = false,
-                                              isShowTaskNumbers = true,
-                                              isUnknownDates = false,
-                                              isAdjustToWorkingDates = true,
-                                              onAddTask = undefined,
-                                              onAddTaskClick = undefined,
-                                              onArrowDoubleClick: onArrowDoubleClickProp = undefined,
-                                              onChangeExpandState = undefined,
-                                              onChangeTasks = undefined,
-                                              onClick = undefined,
-                                              onDateChange: onDateChangeProp = undefined,
-                                              onDelete = undefined,
-                                              onDoubleClick = undefined,
-                                              onEditTask = undefined,
-                                              onEditTaskClick = undefined,
-                                              onFixDependencyPosition: onFixDependencyPositionProp = undefined,
-                                              onMoveTaskBefore = undefined,
-                                              onMoveTaskAfter = undefined,
-                                              onMoveTaskInside = undefined,
-                                              onProgressChange: onProgressChangeProp = undefined,
-                                              onRelationChange: onRelationChangeProp = undefined,
-                                              onResizeColumn = undefined,
-                                              onWheel,
-                                              preStepsCount = 1,
-                                              renderBottomHeader = undefined,
-                                              renderTopHeader = undefined,
-                                              roundDate: roundDateProp = defaultRoundDate,
-                                              dateMoveStep = { value: 1, timeUnit: GanttDateRoundingTimeUnit.DAY },
-                                              rtl = false,
-                                              tasks,
-                                              timeStep = 300000,
-                                              viewDate,
-                                              viewMode = ViewMode.Day
-                                            }) => {
+export interface ExposeMethods {
+  scrollToDate: (date: Date) => void;
+}
+
+export const Gantt = forwardRef<ExposeMethods, GanttProps>(({
+  TaskListHeader = TaskListHeaderDefault,
+  TaskListTable = TaskListTableDefault,
+  TooltipContent = StandardTooltipContent,
+  ContextualPalette,
+  TaskDependencyContextualPalette,
+  authorizedRelations = [
+    "startToStart",
+    "startToEnd",
+    "endToStart",
+    "endToEnd"
+  ],
+  canMoveTasks = true,
+  canResizeColumns = true,
+  checkIsHoliday: checkIsHolidayProp = defaultCheckIsHoliday,
+  colors = defaultColors,
+  columns: columnsProp = undefined,
+  comparisonLevels = 1,
+  contextMenuOptions: contextMenuOptionsProp = undefined,
+  dateFormats: dateFormatsProp = undefined,
+  dateLocale = enDateLocale,
+  distances: distancesProp = undefined,
+  enableTableListContextMenu = false,
+  fixEndPosition: fixEndPositionProp = undefined,
+  fixStartPosition: fixStartPositionProp = undefined,
+  fontFamily = "Arial, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue",
+  fontSize = "14px",
+  getCopiedTaskId = defaultGetCopiedTaskId,
+  icons = undefined,
+  isDeleteDependencyOnDoubleClick = true,
+  isMoveChildsWithParent = true,
+  isUpdateDisabledParentsOnChange = true,
+  isShowChildOutOfParentWarnings = false,
+  isShowCriticalPath = false,
+  isShowDependencyWarnings = false,
+  isShowTaskNumbers = true,
+  isUnknownDates = false,
+  isAdjustToWorkingDates = true,
+  onAddTask = undefined,
+  onAddTaskClick = undefined,
+  onArrowDoubleClick: onArrowDoubleClickProp = undefined,
+  onChangeExpandState = undefined,
+  onChangeTasks = undefined,
+  onClick = undefined,
+  onDateChange: onDateChangeProp = undefined,
+  onDelete = undefined,
+  onDoubleClick = undefined,
+  onEditTask = undefined,
+  onEditTaskClick = undefined,
+  onFixDependencyPosition: onFixDependencyPositionProp = undefined,
+  onMoveTaskBefore = undefined,
+  onMoveTaskAfter = undefined,
+  onMoveTaskInside = undefined,
+  onProgressChange: onProgressChangeProp = undefined,
+  onRelationChange: onRelationChangeProp = undefined,
+  onResizeColumn = undefined,
+  onWheel,
+  preStepsCount = 1,
+  renderBottomHeader = undefined,
+  renderTopHeader = undefined,
+  roundDate: roundDateProp = defaultRoundDate,
+  dateMoveStep = { value: 1, timeUnit: GanttDateRoundingTimeUnit.DAY },
+  rtl = false,
+  tasks,
+  timeStep = 300000,
+  viewDate,
+  viewMode = ViewMode.Day
+}, ref) => {
   const ganttSVGRef = useRef<SVGSVGElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const taskListRef = useRef<HTMLDivElement>(null);
@@ -249,6 +253,7 @@ export const Gantt: React.FC<GanttProps> = ({
     ganttTaskRootRef,
     scrollX,
     setScrollXProgrammatically,
+    scrollXToDate,
     onVerticalScrollbarScrollX,
     scrollToLeftStep,
     scrollToRightStep
@@ -1927,6 +1932,17 @@ export const Gantt: React.FC<GanttProps> = ({
     onExpandAll
   };
 
+  useImperativeHandle(ref, () => ({
+    scrollToDate: (date: Date) => {
+      scrollXToDate({
+        targetDate: date,
+        startDate,
+        viewMode,
+        columnWidth: distances.columnWidth,
+      });
+    }
+  }));
+
   const displayTable = !columnsProp || columnsProp.length > 0;
   return (
     <div
@@ -1991,4 +2007,4 @@ export const Gantt: React.FC<GanttProps> = ({
       )}
     </div>
   );
-};
+});

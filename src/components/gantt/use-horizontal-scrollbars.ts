@@ -82,6 +82,11 @@ export const useHorizontalScrollbars = (): [
       }
 
       setScrollX(nextScrollX);
+
+      document.documentElement.style.setProperty(
+        "--gantt-scroll-left",
+        `${nextScrollX}px`
+      );
     },
     []
   );

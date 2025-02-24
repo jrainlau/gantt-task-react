@@ -69,6 +69,7 @@ export type TaskListProps = {
   onScrollTableListContentVertically: (
     event: SyntheticEvent<HTMLDivElement>
   ) => void;
+  ganttHeight: string;
 } & TaskListHeaderActionsProps;
 
 const TaskListInner: React.FC<TaskListProps & TaskListHeaderActionsProps> = (
@@ -111,7 +112,8 @@ const TaskListInner: React.FC<TaskListProps & TaskListHeaderActionsProps> = (
     onScrollTableListContentVertically,
     onCollapseAll,
     onExpandFirstLevel,
-    onExpandAll
+    onExpandAll,
+    ganttHeight,
   }) => {
   // Manage the column and list table resizing
   const [
@@ -154,6 +156,7 @@ const TaskListInner: React.FC<TaskListProps & TaskListHeaderActionsProps> = (
           className={styles.taskListContent}
           ref={taskListContentRef}
           onScroll={onScrollTableListContentVertically}
+          style={{ height: ganttHeight }}
         >
           <div
             style={{

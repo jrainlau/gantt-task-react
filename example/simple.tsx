@@ -9,7 +9,7 @@ import { onAddTask, onEditTask } from './helper';
 import '../dist/style.css';
 import { ExposeMethods } from '../src/components/gantt/gantt';
 
-const NUMBER_OF_SUBTASKS = 6;
+const NUMBER_OF_SUBTASKS = 36;
 
 const initTasks = () => {
   const res: TaskOrEmpty[] = [];

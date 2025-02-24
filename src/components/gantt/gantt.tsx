@@ -233,7 +233,8 @@ export const Gantt = forwardRef<ExposeMethods, GanttProps>(({
   tasks,
   timeStep = 300000,
   viewDate,
-  viewMode = ViewMode.Day
+  viewMode = ViewMode.Day,
+  ganttHeight = '80vh',
 }, ref) => {
   const ganttSVGRef = useRef<SVGSVGElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -1929,7 +1930,8 @@ export const Gantt = forwardRef<ExposeMethods, GanttProps>(({
     onScrollTableListContentVertically: onScrollVertically,
     onCollapseAll,
     onExpandFirstLevel,
-    onExpandAll
+    onExpandAll,
+    ganttHeight,
   };
 
   useImperativeHandle(ref, () => ({
@@ -1958,7 +1960,7 @@ export const Gantt = forwardRef<ExposeMethods, GanttProps>(({
       }}
     >
       {/* {columns.length > 0 && <TaskList {...tableProps} />} */}
-      {displayTable && <TaskList {...tableProps} />}
+      {displayTable && <TaskList { ...tableProps } />}
 
       <TaskGantt
         barProps={barProps}
@@ -1977,6 +1979,7 @@ export const Gantt = forwardRef<ExposeMethods, GanttProps>(({
         handleEditTask={handleEditTask}
         scrollToTask={scrollToTask}
         selectTask={selectTask}
+        ganttHeight={ganttHeight}
       />
 
       {tooltipTaskFromMap && (

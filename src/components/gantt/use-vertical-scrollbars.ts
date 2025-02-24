@@ -30,11 +30,15 @@ export const useVerticalScrollbars = (): [
       // The line below allow to lower ganttTaskContentRef.current.scrollTop
       ganttTaskContentRef.current.scrollTop =
         taskListContentRef.current.scrollTop;
+
+      document.documentElement.style.setProperty('--gantt-scroll-top', `-${ganttTaskContentRef.current.scrollTop}px`);
     } else {
       ganttTaskContentRef.current.scrollTop =
         taskListContentRef.current.scrollTop;
       taskListContentRef.current.scrollTop =
         ganttTaskContentRef.current.scrollTop;
+
+      document.documentElement.style.setProperty('--gantt-scroll-top', `-${taskListContentRef.current.scrollTop}px`);
     }
   };
 

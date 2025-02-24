@@ -54,6 +54,7 @@ export type TaskGanttProps = {
   handleEditTask: (editableTaskInfo: EditableTaskInfo) => void;
   scrollToTask: (task: Task) => void;
   selectTask: (taskId: string) => void;
+  ganttHeight: string;
 };
 
 const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
@@ -75,11 +76,13 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
     handleEditTask,
     scrollToTask,
     selectTask,
+    ganttHeight,
   } = props;
   const containerStyle: CSSProperties = {
     // In order to see the vertical scrollbar of the gantt content,
     // we resize dynamically the width of the gantt content
-    height: Math.max(ganttFullHeight, minimumRowDisplayed * rowHeight),
+    // height: Math.max(ganttFullHeight, minimumRowDisplayed * rowHeight),
+    height: ganttHeight,
     // width: ganttTaskRootRef?.current
     //   ? ganttTaskRootRef.current.clientWidth +
     //     ganttTaskRootRef.current.scrollLeft
@@ -237,17 +240,17 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       const { intersectionRatio, isIntersecting, boundingClientRect, rootBounds, target } = entry;
-      const taskId = (target as HTMLElement).dataset.taskId
-      if (!intersectionRatio && !isIntersecting) {
-        if (boundingClientRect.x >= rootBounds.x + rootBounds.width) {
-          updateTaskPos(taskId, 'right')
-        } else {
-          updateTaskPos(taskId, 'left')
-        }
-      }
+      const taskId = (target as HTMLElement).dataset.taskId;
 
-      if (intersectionRatio) {
-        updateTaskPos(taskId, 'middle')
+      if (!intersectionRatio && !isIntersecting) {
+        // 只判断水平方向的位置
+        if (boundingClientRect.x >= rootBounds.x + rootBounds.width) {
+          updateTaskPos(taskId, 'right');
+        } else if (boundingClientRect.x + boundingClientRect.width <= rootBounds.x) {
+          updateTaskPos(taskId, 'left');
+        }
+      } else if (intersectionRatio) {
+        updateTaskPos(taskId, 'middle');
       }
     })
 
@@ -278,7 +281,10 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
     <div
       className={[styles.ganttTaskRoot, 'gantt-task-root'].join(' ')}
       ref={ganttTaskRootRef}
-      onScroll={onVerticalScrollbarScrollX}
+      onScroll={(e) => {
+        onVerticalScrollbarScrollX(e)
+        console.log(e)
+      }}
       dir="ltr"
     >
       <Calendar {...calendarProps} colors={colors} />
@@ -291,6 +297,7 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
       >
         <div style={gridStyle}>
           <svg
+            className="gantt-svg"
             xmlns="http://www.w3.org/2000/svg"
             width={fullSvgWidth}
             height={ganttFullHeight}
@@ -320,6 +327,16 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
               }}
             />
           </svg>
+
+          <QuickLocateBtns
+            fullRowHeight={fullRowHeight}
+            barProps={barProps}
+            taskItemPosMap={taskItemPosMap}
+            scrollToTask={scrollToTask}
+            selectTask={selectTask}
+            ganttTaskContentRef={ganttTaskContentRef}
+            ganttTaskRootRef={ganttTaskRootRef}
+          />
         </div>
         {barProps.ContextualPalette && open && (
           <ClickAwayListener onClickAway={onClickAway}>
@@ -349,16 +366,6 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
             </ClickAwayListener>
           )}
       </div>
-
-      <QuickLocateBtns
-        fullRowHeight={fullRowHeight}
-        barProps={barProps}
-        taskItemPosMap={taskItemPosMap}
-        scrollToTask={scrollToTask}
-        selectTask={selectTask}
-        ganttTaskContentRef={ganttTaskContentRef}
-        ganttTaskRootRef={ganttTaskRootRef}
-      />
     </div>
     </ScrollContext.Provider>
   );

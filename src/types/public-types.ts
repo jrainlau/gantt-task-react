@@ -616,6 +616,7 @@ export interface GanttProps extends EventOption, DisplayOption, StylingOption {
    */
   isAdjustToWorkingDates?: boolean;
   tasks: readonly TaskOrEmpty[];
+  ganttHeight?: string;
 }
 
 export interface TaskListTableProps {

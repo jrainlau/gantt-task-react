@@ -67,6 +67,7 @@ const QuickLocateBtnsInner: React.FC<QuickLocateBtnsProps> = ({
         position: 'fixed',
         top: svgY,
         left: svgX,
+        transform: `translateY(var(--gantt-scroll-top))`,
       }
 
       quickLocateBtnsRes.push(
@@ -75,6 +76,7 @@ const QuickLocateBtnsInner: React.FC<QuickLocateBtnsProps> = ({
           style={btnStyle}
           width={BTN_WIDTH}
           height={fullRowHeight}
+          data-xxx={ganttTaskContentRef.current.scrollTop}
           key={key}
           onClick={() => {
             scrollToTask(task)
@@ -82,9 +84,9 @@ const QuickLocateBtnsInner: React.FC<QuickLocateBtnsProps> = ({
           }}
         >
           <rect x="5" y="5" width={ 50 } height={ 40 } fill="transparent" />
-            <rect x="5" y="5" width={ 50 } height={ 40 } stroke="gray" stroke-dasharray="5 5" fill="none"/>
-            <line x1={ 30 } y1={ 15 } x2={ 30 } y2={ 35 } stroke="gray" stroke-width="2"/>
-            <line x1="20" y1={ 25 } x2={ 40 } y2={ 25 } stroke="gray" stroke-width="2"/>
+          <rect x="5" y="5" width={ 50 } height={ 40 } stroke="gray" stroke-dasharray="5 5" fill="none"/>
+          <line x1={ 30 } y1={ 15 } x2={ 30 } y2={ 35 } stroke="gray" stroke-width="2"/>
+          <line x1="20" y1={ 25 } x2={ 40 } y2={ 25 } stroke="gray" stroke-width="2"/>
         </svg>
       );
     }

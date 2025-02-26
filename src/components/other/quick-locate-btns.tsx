@@ -9,7 +9,7 @@ type QuickLocateBtnsProps = {
   taskItemPosMap: TaskItemPosMap;
   scrollToTask: (task: Task) => void;
   selectTask: (taskId: string) => void;
-  ganttTaskContentRef: RefObject<HTMLDivElement>;
+  ganttFullHeight: number;
   ganttTaskRootRef: RefObject<HTMLDivElement>;
 }
 
@@ -19,9 +19,23 @@ const QuickLocateBtnsInner: React.FC<QuickLocateBtnsProps> = ({
   taskItemPosMap,
   scrollToTask,
   selectTask,
-  ganttTaskContentRef,
+  ganttFullHeight,
   ganttTaskRootRef,
 }) => {
+  const wrapperStyle: CSSProperties = useMemo(() => {
+    if (!ganttTaskRootRef.current) return {};
+    const { top, left, width, height } = ganttTaskRootRef.current.getBoundingClientRect();
+    return {
+      position: 'fixed',
+      top: top + 56,
+      left,
+      width,
+      height: height - 56,
+      pointerEvents: 'none',
+      overflow: 'hidden'
+    }
+  }, [ganttTaskRootRef.current]);
+
   const renderQuickLocateBtns = useMemo(() => {
     if (!barProps.renderedRowIndexes) {
       return [];
@@ -59,15 +73,14 @@ const QuickLocateBtnsInner: React.FC<QuickLocateBtnsProps> = ({
         levelY,
       } = barProps.getTaskCoordinates(task);
 
-      const svgY = ganttTaskContentRef.current.getBoundingClientRect().y + levelY;
-      const rootRect = ganttTaskRootRef.current.getBoundingClientRect();
-      const svgX = taskItemPosMap.left.has(task.id) ? rootRect.x : rootRect.width + rootRect.x - BTN_WIDTH;
+      const svgY = levelY;
 
       const btnStyle: CSSProperties = {
-        position: 'fixed',
+        position: 'absolute',
         top: svgY,
-        left: svgX,
-        transform: `translateY(var(--gantt-scroll-top))`,
+        zIndex: 1,
+        pointerEvents: 'auto',
+        ...(taskItemPosMap.right.has(task.id) ? { right: 0 } : { left: 0 }),
       }
 
       quickLocateBtnsRes.push(
@@ -76,7 +89,6 @@ const QuickLocateBtnsInner: React.FC<QuickLocateBtnsProps> = ({
           style={btnStyle}
           width={BTN_WIDTH}
           height={fullRowHeight}
-          data-xxx={ganttTaskContentRef.current.scrollTop}
           key={key}
           onClick={() => {
             scrollToTask(task)
@@ -99,9 +111,11 @@ const QuickLocateBtnsInner: React.FC<QuickLocateBtnsProps> = ({
   ]);
 
   return (
-    <>
-     { renderQuickLocateBtns }
-    </>
+    <div style={wrapperStyle}>
+     <div style={{ position: 'relative', transform: `translateY(var(--gantt-scroll-top))`, width: '100%', height: ganttFullHeight }}>
+      { renderQuickLocateBtns }
+     </div>
+    </div>
   )
 }
 

@@ -281,10 +281,7 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
     <div
       className={[styles.ganttTaskRoot, 'gantt-task-root'].join(' ')}
       ref={ganttTaskRootRef}
-      onScroll={(e) => {
-        onVerticalScrollbarScrollX(e)
-        console.log(e)
-      }}
+      onScroll={onVerticalScrollbarScrollX}
       dir="ltr"
     >
       <Calendar {...calendarProps} colors={colors} />
@@ -334,10 +331,11 @@ const TaskGanttInner: React.FC<TaskGanttProps> = (props) => {
             taskItemPosMap={taskItemPosMap}
             scrollToTask={scrollToTask}
             selectTask={selectTask}
-            ganttTaskContentRef={ganttTaskContentRef}
+            ganttFullHeight={ganttFullHeight}
             ganttTaskRootRef={ganttTaskRootRef}
           />
         </div>
+
         {barProps.ContextualPalette && open && (
           <ClickAwayListener onClickAway={onClickAway}>
             <Popper
